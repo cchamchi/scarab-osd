@@ -59,14 +59,14 @@ uint8_t fieldIsVisible(uint8_t pos) {
 char *FormatGPSCoord(uint16_t t_position, int32_t val, uint8_t t_cardinalaxis) {  // lat = 0 or lon = 2
 
   uint8_t t_leadicon = SYM_LAT;
-  if (t_cardinalaxis>0) 
-    t_leadicon++;  
+  if (t_cardinalaxis > 0)
+    t_leadicon++;
   uint8_t t_cardinal = 0;
   if (val < 0) {
-      t_cardinal ++;
+    t_cardinal ++;
     val = -val;
   }
-  t_cardinal+=t_cardinalaxis;
+  t_cardinal += t_cardinalaxis;
 
   uint8_t bytes = 11;
   val = val / 100;
@@ -93,7 +93,7 @@ char *FormatGPSCoord(uint16_t t_position, int32_t val, uint8_t t_cardinalaxis) {
     screenBuffer[3] = '3';
   }
 
-   MAX7456_WriteString(screenBuffer, t_position);
+  MAX7456_WriteString(screenBuffer, t_position);
 }
 
 #ifdef VIRTUAL_NOSE
@@ -194,7 +194,7 @@ void displayMode(void)
   else if (MwSensorActive & mode.gpshold) {
     flightmode = 6;
   }
-  else if (MwSensorActive & mode.cruise){
+  else if (MwSensorActive & mode.cruise) {
     flightmode = 4;
   }
   else if (MwSensorActive & mode.stable) {
@@ -272,7 +272,7 @@ void displayMode(void)
     apactive = 3;
   else if (MwSensorActive & mode.gpsmission)
     apactive = 4;
-#ifdef EXTENDEDMODESUPPORT  
+#ifdef EXTENDEDMODESUPPORT
   else if (MwSensorActive & mode.launch)
     apactive = 5;
   else if (MwSensorActive & mode.autotrim)
@@ -582,7 +582,7 @@ void displayVidVoltage(void)
 }
 
 
-void displayCurrentThrottle(void){
+void displayCurrentThrottle(void) {
 
 #ifdef AUTOTHROTTLE
   if (MwRcData[THROTTLESTICK] > HighT) HighT = MwRcData[THROTTLESTICK];
@@ -594,16 +594,16 @@ void displayCurrentThrottle(void){
   LowT = LOWTHROTTLE;
 #endif
   uint16_t t_throttle = MwRcData[THROTTLESTICK];
-  uint8_t t_symbol=0;
+  uint8_t t_symbol = 0;
   if (Settings[S_THROTTLE_PWM] == 0) {
     t_throttle = map(MwRcData[THROTTLESTICK], LowT, HighT, 0, 100);
-    t_symbol=SYM_PERCENT;
+    t_symbol = SYM_PERCENT;
   }
-  if (!armed){
+  if (!armed) {
     t_throttle = 0;
     t_symbol   = SYM_ZERO;
   }
-  displayItem(CurrentThrottlePosition, t_throttle, SYM_THR, t_symbol, 0 );  
+  displayItem(CurrentThrottlePosition, t_throttle, SYM_THR, t_symbol, 0 );
 }
 
 void OLDdisplayCurrentThrottle(void)
@@ -657,69 +657,69 @@ void OLDdisplayCurrentThrottle(void)
 
 void displayTimer(uint32_t t_time, uint16_t t_pos, uint8_t t_leadsymbol)
 {
-  if (t_time>=3600){
-    t_time /=60;
+  if (t_time >= 3600) {
+    t_time /= 60;
   }
-  uint32_t digit0 = t_time/60;
-  uint32_t digit1 = t_time%60;
-  if (t_leadsymbol>0){
-    screenBuffer[0]=t_leadsymbol;
-    screenBuffer[1]=0;
-    MAX7456_WriteString(screenBuffer, t_pos);  
+  uint32_t digit0 = t_time / 60;
+  uint32_t digit1 = t_time % 60;
+  if (t_leadsymbol > 0) {
+    screenBuffer[0] = t_leadsymbol;
+    screenBuffer[1] = 0;
+    MAX7456_WriteString(screenBuffer, t_pos);
     t_pos++;
   }
   formatDateTime(digit0, digit1, 0, ':', 0);
-  MAX7456_WriteString(screenBuffer, t_pos);  
+  MAX7456_WriteString(screenBuffer, t_pos);
 }
 
 
-void displayRemainingTime(void){
+void displayRemainingTime(void) {
   int32_t t_remaining;
-  int32_t t_used = 100 * Settings[S_AMPER_HOUR_ALARM]- (amperagesum/(360));  
+  int32_t t_used = 100 * Settings[S_AMPER_HOUR_ALARM] - (amperagesum / (360));
   if (screenPosition[remainingTimePosition] < 512)
     return;
-  if (t_used < 0){
+  if (t_used < 0) {
     t_used = 0;
   }
-#ifdef EFFICIENCYTIMEINST  
-  if (amperage>1){
-    t_remaining = (uint32_t) 60 * 60 *(t_used)/(amperage * 100);
+#ifdef EFFICIENCYTIMEINST
+  if (amperage > 1) {
+    t_remaining = (uint32_t) 60 * 60 * (t_used) / (amperage * 100);
   }
 #else
-  if (amperagesum>100){
-    t_remaining = (uint32_t) flyTime *(t_used)/(amperagesum/360);
+  if (amperagesum > 100) {
+    t_remaining = (uint32_t) flyTime * (t_used) / (amperagesum / 360);
   }
 #endif
-  else{ 
+  else {
     t_remaining = 0;
   }
-  displayTimer(t_remaining,getPosition(remainingTimePosition), 0x2A);
+  displayTimer(t_remaining, getPosition(remainingTimePosition), 0x2A);
 }
 
 
-void displayFlightTime(void){
+void displayFlightTime(void) {
   if (screenPosition[onTimePosition] < 512)
     return;
 
   uint32_t displaytime;
   uint8_t t_leadsymbol = 0;
-  
+
   if (armed) {
     if (Settings[S_FLYTIME_ALARM] > 0) {
       if (((flyTime / 60) >= Settings[S_FLYTIME_ALARM]) && (timer.Blink2hz))
         return;
     }
-      t_leadsymbol +=2;
-      displaytime = flyTime;
+    t_leadsymbol += 2;
+    displaytime = flyTime;
   }
   else {
-      screenBuffer[0] = SYM_ON_H;
-      displaytime = onTime;
+    screenBuffer[0] = SYM_ON_H;
+    displaytime = onTime;
   }
-  if (displaytime>=3600){
-    t_leadsymbol+=1;
+  if (displaytime >= 3600) {
+    t_leadsymbol += 1;
   }
-  displayTimer(displaytime,getPosition(onTimePosition), flightUnitAdd[t_leadsymbol]);
+  displayTimer(displaytime, getPosition(onTimePosition), flightUnitAdd[t_leadsymbol]);
 }
 
 
@@ -760,10 +760,10 @@ void displayEfficiency(void)
 void displayAverageEfficiency(void)
 {
   uint16_t t_efficiency;
-  if (flyTime > 0){
-    t_efficiency = (uint32_t) amperagesum /(6 * flyTime) ;
-  if (t_efficiency < 99999)
-    displayItem(avgefficiencyPosition, t_efficiency, SYM_AVG_EFF, 0, 0 );
+  if (flyTime > 0) {
+    t_efficiency = (uint32_t) amperagesum / (6 * flyTime) ;
+    if (t_efficiency < 99999)
+      displayItem(avgefficiencyPosition, t_efficiency, SYM_AVG_EFF, 0, 0 );
   }
 }
 
@@ -2407,13 +2407,13 @@ void updateDateTime(uint32_t t_time)
   //datetime.unixtime=1527712200; // 30/05/2018 @ 20:30 UTC for testing
 
   t_time -= 946684800;
-  uint8_t  t_year=0;
-  uint8_t  t_month=0;
-  uint8_t  t_monthsize=0;
-  uint32_t t_days=0;
+  uint8_t  t_year = 0;
+  uint8_t  t_month = 0;
+  uint8_t  t_monthsize = 0;
+  uint32_t t_days = 0;
   static const uint8_t daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-#define LEAP_YEAR(Y) !(((Y))%4) 
+#define LEAP_YEAR(Y) !(((Y))%4)
 #ifndef DATEFORMAT_UTC
   int32_t t_tzhours = 3600 * (128 - Settings[S_GPSTZ]);
   t_time = t_time - t_tzhours;
@@ -2461,15 +2461,146 @@ void updateDateTime(uint32_t t_time)
 
 void displayGPSPosition(void)
 {
-  if (!fieldIsVisible(MwGPSLatPositionTop)){
+  if (!fieldIsVisible(MwGPSLatPositionTop)) {
     return;
   }
   uint16_t t_position;
   t_position = getPosition(MwGPSLatPositionTop);
-  FormatGPSCoord(t_position,GPS_latitude, 0) ;
+  FormatGPSCoord(t_position, GPS_latitude, 0) ;
   t_position = getPosition(MwGPSLonPositionTop);
-  FormatGPSCoord(t_position,GPS_longitude, 2) ;
+  FormatGPSCoord(t_position, GPS_longitude, 2) ;
 }
 
 
+// **************
+// Telemetry test code
+// **************
+void displayTestItem(uint16_t t_position, int16_t t_value, uint8_t t_leadicon, uint8_t t_trailicon, uint8_t t_pdec )
+{
+  /*
+   *  t_position  = screen position
+   *  t_value     = numerical value
+   *  t_leadicon  = hex position of leading character. 0 = no leading character.
+   *  t_trailicon = hex position of trailing character. 0 = no trailing character.
+   *  t_psize     = number of characters to right justify value into. 0 = left justified with no padding.
+   *  t_pdec      = decimal precision or char position of decimal point within right justified psize. e.g for 16.1 use t_psize=4,t_pdec=3
+  */
 
+  uint8_t t_offset = 0;
+  uint8_t t_decsize = 0;
+
+  if (t_leadicon > 0) { // has a lead icon
+    screenBuffer[0] = t_leadicon;
+    t_offset = 1;
+  }
+  else {
+    t_offset = 0;
+  }
+  itoa(t_value, screenBuffer + t_offset, 10);
+  if (t_pdec > 0) {
+    t_pdec++;
+    t_decsize = FindNull();
+    uint8_t singlevalue = 2 + t_offset;
+    if (t_decsize == 1 + t_offset ) {
+      screenBuffer[singlevalue] = 0;
+      screenBuffer[singlevalue - 1] = screenBuffer[t_offset];
+      screenBuffer[singlevalue - 2] = 0x30;
+      t_decsize++;
+    }
+    while (t_pdec != 0) {
+      if (t_decsize > 0)
+        screenBuffer[t_decsize + 1] = screenBuffer[t_decsize];
+      t_decsize--;
+      t_pdec--;
+    }
+    screenBuffer[t_decsize + 1] = 0x2E;
+  }
+  if (t_trailicon > 0) { // has a trailing icon
+    t_offset = FindNull();
+    screenBuffer[t_offset++] = t_trailicon;
+    screenBuffer[t_offset] = 0;
+  }
+  MAX7456_WriteString(screenBuffer, t_position);
+}
+
+
+//Telemetry
+int8_t trk_yaw = 0;
+int8_t trk_pitch = 0;
+int8_t trk_ctr = 0;
+
+void displayTelemetry(void)
+{
+  //#define SYM_MARK  0x31        // "1" for binary 1 visualisation
+  //#define SYM_SPACE 0x30        // "0" for binary 0 visualisation
+  #define SYM_MARK  0xC3          // Character used for binary 1
+  #define SYM_SPACE 0xC2          // Character used for ninary 0
+  #define TELEMPOS  (LINE*10) + 4 // Where to put on screen 
+
+  uint8_t trk_bitpos = 0;
+ 
+   // simulate changes. Pitch 0-90. Yaw -180 to 180, but mapped to -90 to 90 with 1 deg resolution
+  if (trk_pitch == 91) {
+    trk_pitch = 0;
+  }
+    if (trk_yaw == 91) {
+    trk_yaw = -89;
+  }
+  if (trk_ctr == 5) {
+    trk_ctr = 0;
+  }
+
+  displayTestItem((LINE * 7) + 10, trk_yaw, 0x59, 0, 0 );
+  displayTestItem((LINE * 8) + 10, trk_pitch, 0x50, 0, 0 );
+  displayTestItem((LINE * 9) + 10, trk_ctr, 0x43, 0, 0 );
+
+  trk_bitpos=0;
+  for (uint8_t t_ctr = 0; t_ctr < 8; ++t_ctr){
+    if (trk_yaw&1<<t_ctr){
+      screenBuffer[trk_bitpos] = SYM_MARK;
+    }
+    else{
+      screenBuffer[trk_bitpos] = SYM_SPACE;        
+    }
+    trk_bitpos++;
+  }
+  screenBuffer[trk_bitpos] = SYM_BLANK;        
+  trk_bitpos++;
+  screenBuffer[trk_bitpos] = 0;
+  MAX7456_WriteString(screenBuffer, TELEMPOS);
+      
+  trk_bitpos=0;
+  for (uint8_t t_ctr = 0; t_ctr < 8; ++t_ctr){
+    if (trk_pitch&1<<t_ctr){
+      screenBuffer[trk_bitpos] = SYM_MARK;
+    }
+    else{
+      screenBuffer[trk_bitpos] = SYM_SPACE;        
+    }
+    trk_bitpos++;
+  }
+  screenBuffer[trk_bitpos] = SYM_BLANK;        
+  trk_bitpos++;
+  screenBuffer[trk_bitpos] = 0;
+  MAX7456_WriteString(screenBuffer, TELEMPOS + 8);
+
+  trk_bitpos=0;
+  for (uint8_t t_ctr = 0; t_ctr < 8; ++t_ctr){
+    if (trk_ctr&1<<t_ctr){
+      screenBuffer[trk_bitpos] = SYM_MARK;
+    }
+    else{
+      screenBuffer[trk_bitpos] = SYM_SPACE;        
+    }
+    trk_bitpos++;
+  }
+  screenBuffer[trk_bitpos] = SYM_BLANK;        
+  trk_bitpos++;
+  screenBuffer[trk_bitpos] = 0;
+  MAX7456_WriteString(screenBuffer, TELEMPOS + 16);
+
+}
+
+// **************
+// Telemetry test code
+// **************

@@ -407,6 +407,10 @@ uint8_t settingsMode=0;
 uint16_t framerate = 0;
 uint16_t packetrate = 0;
 uint16_t serialrxrate = 0;
+//Telemetry
+int8_t trk_yaw = 0;
+int8_t trk_pitch = 0;
+int8_t trk_ctr = 0;
 
 // Mode bits
 struct __mode {
