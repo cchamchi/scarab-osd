@@ -352,10 +352,7 @@ void loop()
 
   if ((currentMillis - previous_millis_low) >= lo_speed_cycle) // 10 Hz (Executed every 100ms)
   {
-trk_yaw++;
-trk_pitch++;
-trk_ctr++;
-    
+ 
     previous_millis_low = previous_millis_low + lo_speed_cycle;
     timer.tenthSec++;
     timer.halfSec++;
@@ -714,7 +711,7 @@ trk_ctr++;
         displayMAVstatustext();
 #endif
 //#ifdef TELEMETRY
-        displayTelemetry();
+        encodeTelemetry();
 //#endif      
       }
     }

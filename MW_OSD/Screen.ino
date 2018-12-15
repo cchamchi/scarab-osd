@@ -2524,83 +2524,135 @@ void displayTestItem(uint16_t t_position, int16_t t_value, uint8_t t_leadicon, u
 }
 
 
-//Telemetry
-int8_t trk_yaw = 0;
-int8_t trk_pitch = 0;
-int8_t trk_ctr = 0;
-
-void displayTelemetry(void)
+uint16_t crc_accumulate(uint8_t data, uint16_t crcAccum)
 {
-  //#define SYM_MARK  0x31        // "1" for binary 1 visualisation
-  //#define SYM_SPACE 0x30        // "0" for binary 0 visualisation
-  #define SYM_MARK  0xC3          // Character used for binary 1
-  #define SYM_SPACE 0xC2          // Character used for ninary 0
-  #define TELEMPOS  (LINE*10) + 4 // Where to put on screen 
+        uint8_t tmp;
+        tmp = data ^ (uint8_t)(crcAccum &0xff);
+        tmp ^= (tmp<<4);
+        crcAccum = (crcAccum>>8) ^ (tmp<<8) ^ (tmp <<3) ^ (tmp>>4);
+        return crcAccum;
+}
 
-  uint8_t trk_bitpos = 0;
- 
-   // simulate changes. Pitch 0-90. Yaw -180 to 180, but mapped to -90 to 90 with 1 deg resolution
-  if (trk_pitch == 91) {
-    trk_pitch = 0;
-  }
-    if (trk_yaw == 91) {
-    trk_yaw = -89;
-  }
-  if (trk_ctr == 5) {
-    trk_ctr = 0;
-  }
 
-  displayTestItem((LINE * 7) + 10, trk_yaw, 0x59, 0, 0 );
-  displayTestItem((LINE * 8) + 10, trk_pitch, 0x50, 0, 0 );
-  displayTestItem((LINE * 9) + 10, trk_ctr, 0x43, 0, 0 );
+void decodeTelemetry(uint32_t t_data){
 
-  trk_bitpos=0;
-  for (uint8_t t_ctr = 0; t_ctr < 8; ++t_ctr){
-    if (trk_yaw&1<<t_ctr){
-      screenBuffer[trk_bitpos] = SYM_MARK;
-    }
-    else{
-      screenBuffer[trk_bitpos] = SYM_SPACE;        
-    }
-    trk_bitpos++;
-  }
-  screenBuffer[trk_bitpos] = SYM_BLANK;        
-  trk_bitpos++;
-  screenBuffer[trk_bitpos] = 0;
-  MAX7456_WriteString(screenBuffer, TELEMPOS);
-      
-  trk_bitpos=0;
-  for (uint8_t t_ctr = 0; t_ctr < 8; ++t_ctr){
-    if (trk_pitch&1<<t_ctr){
-      screenBuffer[trk_bitpos] = SYM_MARK;
-    }
-    else{
-      screenBuffer[trk_bitpos] = SYM_SPACE;        
-    }
-    trk_bitpos++;
-  }
-  screenBuffer[trk_bitpos] = SYM_BLANK;        
-  trk_bitpos++;
-  screenBuffer[trk_bitpos] = 0;
-  MAX7456_WriteString(screenBuffer, TELEMPOS + 8);
+  uint8_t  trk_pitch = t_data & 0xFF;            // elevation angle to target. 0 to +180 degrees. 0 = nadir, 180 = zenith
+  uint16_t trk_yaw   = (t_data >> 8)  & 0x01FF;  // yaw angle to target. 0 = true north. 0 to +360
+  uint16_t trk_crc   = (t_data >> 17) & 0x7FFF;  // CRC check bit 
+  uint16_t trk_crc_check;
+  
+  trk_crc_check =crc_accumulate(trk_pitch, trk_crc_check);
+  trk_crc_check =crc_accumulate(trk_yaw&0xFF, trk_crc_check);
+  trk_crc_check =crc_accumulate(trk_yaw>>8, trk_crc_check);
+  trk_crc_check = trk_crc_check &0x7FFF;
 
-  trk_bitpos=0;
-  for (uint8_t t_ctr = 0; t_ctr < 8; ++t_ctr){
-    if (trk_ctr&1<<t_ctr){
-      screenBuffer[trk_bitpos] = SYM_MARK;
-    }
-    else{
-      screenBuffer[trk_bitpos] = SYM_SPACE;        
-    }
-    trk_bitpos++;
+  if (trk_crc_check == trk_crc){
+    screenBuffer[0] = 0x50;
+    screenBuffer[1] = 0x41;
+    screenBuffer[2] = 0x53;
+    screenBuffer[3] = 0x53;
+    screenBuffer[4] = 0x00;
+    MAX7456_WriteString(screenBuffer, 23+(LINE*10));  
   }
-  screenBuffer[trk_bitpos] = SYM_BLANK;        
-  trk_bitpos++;
-  screenBuffer[trk_bitpos] = 0;
-  MAX7456_WriteString(screenBuffer, TELEMPOS + 16);
+  else{
+    itoa(0, screenBuffer, 10);
+    MAX7456_WriteString(screenBuffer, 23+(LINE*10));      
+  }
+   
+  itoa(trk_pitch, screenBuffer, 10);
+  MAX7456_WriteString(screenBuffer, 23+(LINE*7));
+
+  itoa(trk_yaw, screenBuffer, 10);
+  MAX7456_WriteString(screenBuffer, 23+(LINE*8));
+
+  itoa(trk_crc, screenBuffer, 10);
+  MAX7456_WriteString(screenBuffer, 23+(LINE*9));
 
 }
 
+
+
+void encodeTelemetry(void)
+{
+  #define SYM_MARK  0xC3          // Character font used for binary 1
+  #define SYM_SPACE 0xC2          // Character font used for binary 0
+  #define TELEMETRY 0x00          // Which line/position on screen 
+
+  uint32_t        trk_data=0;
+  uint16_t        trk_crc=0;
+  char            trk_buffer[31]; // MAX line buffer
+  static uint8_t  trk_pitch;      // elevation angle to target. 0 to +180 degrees. 0 = nadir, 180 = zenith
+  static uint16_t trk_yaw;        // yaw angle to target. 0 = true north. 0 to +360
+  static uint32_t trk_timer;      // CRC check bit 
+ 
+  // generate simulation test data
+  if (millis()>trk_timer){
+    trk_pitch++;
+    trk_yaw++;
+    trk_timer+=50;
+  }
+  if (trk_pitch>180){
+    trk_pitch = 0;
+  }
+  if (trk_yaw>359){
+    trk_yaw = 0;
+  }
+ 
+  // Prepare pitch and yaw data
+  trk_data = trk_data | trk_pitch;       // bits 0-7
+  trk_data = trk_data | ((uint32_t)trk_yaw << 8);  // bits 8-16
+  
+  // Prepare checksum data 
+
+  trk_crc=crc_accumulate((uint8_t)0xFF&trk_pitch, trk_crc);
+  trk_crc=crc_accumulate(trk_yaw&0xFF, trk_crc);
+  trk_crc=crc_accumulate(trk_yaw>>8, trk_crc);
+   
+  trk_data = trk_data | ((uint32_t)trk_crc << 17); // bits 17-29
+
+  // Prepare screen buffer
+  for (uint8_t t_ctr = 0; t_ctr < 30; t_ctr++){
+    if (trk_data&(uint32_t)1<<t_ctr){
+      trk_buffer[t_ctr] = SYM_MARK;
+    }
+    else{
+      trk_buffer[t_ctr] = SYM_SPACE;        
+    }
+  }
+  trk_buffer[30]=0;
+  
+  // Write telemetry line 
+  MAX7456_WriteString(trk_buffer, TELEMETRY);
+
+  // Display visible telemetry, individual bytes chars and values for test     
+  MAX7456_WriteString(trk_buffer, (LINE*5));
+
+  for (uint8_t t_ctr = 0; t_ctr < 8; t_ctr++){
+    screenBuffer[t_ctr] = trk_buffer[t_ctr];
+  }
+  screenBuffer[8]=0;  
+  MAX7456_WriteString(screenBuffer, 2+(LINE*7));
+  itoa(trk_pitch, screenBuffer, 10);
+  MAX7456_WriteString(screenBuffer, 16+(LINE*7));
+//  
+  for (uint8_t t_ctr = 0; t_ctr < 9; t_ctr++){
+    screenBuffer[t_ctr] = trk_buffer[t_ctr+8];
+  }
+  screenBuffer[9]=0;
+  MAX7456_WriteString(screenBuffer, 2+(LINE*8));
+  itoa(trk_yaw, screenBuffer, 10);
+  MAX7456_WriteString(screenBuffer, 16+(LINE*8));
+//
+  for (uint8_t t_ctr = 0; t_ctr < 13; t_ctr++){
+    screenBuffer[t_ctr] = trk_buffer[t_ctr+17];
+  }
+  screenBuffer[13]=0;
+  MAX7456_WriteString(screenBuffer, 2+(LINE*9));
+  itoa(trk_crc&0x7FFF, screenBuffer, 10);
+  MAX7456_WriteString(screenBuffer, 16+(LINE*9));
+
+  decodeTelemetry(trk_data); 
+}
 // **************
 // Telemetry test code
 // **************

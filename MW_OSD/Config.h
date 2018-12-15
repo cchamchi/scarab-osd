@@ -98,8 +98,8 @@
 /********************       FEATURES      *********************/
 // Disable features if you require memory for other features
 // Further configuration may be require elsewhere in config.h + option enabled on GUI
-#define HORIZON                     // Enable/disable HORIZON indicator
-#define MAPMODE                     // Enable/disable MAP MODE - map indication of relative positions of home and aircraft
+//#define HORIZON                     // Enable/disable HORIZON indicator
+//#define MAPMODE                     // Enable/disable MAP MODE - map indication of relative positions of home and aircraft
 //#define SBDIRECTION               // Enable/disable sidebar indicators (icons indicationg changes in speed or altitude)
 //#define SPORT                     // Enable/disable FRSKY S.PORT cell code
 
@@ -217,8 +217,8 @@
 #define INTRO_CALLSIGN              // Enable to display callsign at startup
 #define INTRO_SIGNALTYPE            // Enable to display video type at startup
 //#define INTRO_FC                  // Enable to display FC version at startup
-#define INTRO_DELAY 6               // Seconds intro screen should show for. Default is 6 
-//#define STARTUPDELAY 500          // Enable alternative startup delay (in ms) to allow MAX chip voltage to rise fully and initialise before configuring. Deafult = 1000
+#define INTRO_DELAY 1               // Seconds intro screen should show for. Default is 6 
+#define STARTUPDELAY 500          // Enable alternative startup delay (in ms) to allow MAX chip voltage to rise fully and initialise before configuring. Deafult = 1000
 
 
 /********************       I2CGPS type settings      *********************/
