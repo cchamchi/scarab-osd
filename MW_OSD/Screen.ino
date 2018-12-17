@@ -2546,27 +2546,28 @@ void decodeTelemetry(uint32_t t_data){
   trk_crc_check =crc_accumulate(trk_yaw>>8, trk_crc_check);
   trk_crc_check = trk_crc_check &0x7FFF;
 
+  // TEST ONLY - generate simulation pitch and yaw test data 
   if (trk_crc_check == trk_crc){
     screenBuffer[0] = 0x50;
     screenBuffer[1] = 0x41;
     screenBuffer[2] = 0x53;
     screenBuffer[3] = 0x53;
     screenBuffer[4] = 0x00;
-    MAX7456_WriteString(screenBuffer, 23+(LINE*10));  
+    MAX7456_WriteString(screenBuffer, 23+(LINE*11));  
   }
   else{
     itoa(0, screenBuffer, 10);
-    MAX7456_WriteString(screenBuffer, 23+(LINE*10));      
+    MAX7456_WriteString(screenBuffer, 23+(LINE*11));      
   }
    
   itoa(trk_pitch, screenBuffer, 10);
-  MAX7456_WriteString(screenBuffer, 23+(LINE*7));
-
-  itoa(trk_yaw, screenBuffer, 10);
   MAX7456_WriteString(screenBuffer, 23+(LINE*8));
 
-  itoa(trk_crc, screenBuffer, 10);
+  itoa(trk_yaw, screenBuffer, 10);
   MAX7456_WriteString(screenBuffer, 23+(LINE*9));
+
+  itoa(trk_crc, screenBuffer, 10);
+  MAX7456_WriteString(screenBuffer, 23+(LINE*10));
 
 }
 
@@ -2607,7 +2608,7 @@ void encodeTelemetry(void)
   static uint16_t trk_yaw;        // yaw angle to target. 0 = true north. 0 to +360
   static uint32_t trk_timer;      // CRC check bit 
  
-  // generate simulation test data
+  // TEST ONLY - generate simulation pitch and yaw test data
   if (millis()>trk_timer){
     trk_pitch++;
     trk_yaw++;
@@ -2632,19 +2633,7 @@ void encodeTelemetry(void)
    
   trk_data = trk_data | ((uint32_t)trk_crc << 17); // bits 17-29
 
-  // For Petr...
-  for (uint8_t t_ctr = 1; t_ctr < 31; t_ctr++){    
-      trk_buffer[t_ctr-1] = SYM_SPACE + (t_ctr%2);
-  }
-  MAX7456_WriteString(trk_buffer, (LINE*2));
-      
-  for (uint8_t t_ctr = 2; t_ctr < 32; t_ctr++){    
-      trk_buffer[t_ctr-2] = SYM_SPACE + (t_ctr%2);
-  }
-  MAX7456_WriteString(trk_buffer, (LINE*3));
-
-
-  // Prepare screen buffer
+  // Prepare screen buffer and write telemetry line
   for (uint8_t t_ctr = 0; t_ctr < 30; t_ctr++){
     if (trk_data&(uint32_t)1<<t_ctr){
       trk_buffer[t_ctr] = SYM_MARK;
@@ -2654,38 +2643,78 @@ void encodeTelemetry(void)
     }
   }
   trk_buffer[30]=0;
-  
-  // Write telemetry line 
   MAX7456_WriteString(trk_buffer, TELEMETRY);
 
-  // Display visible telemetry, individual bytes chars and values for test     
+
+
+
+  // TEST ONLY - display alternate MARK then SPACE...
+  for (uint8_t t_ctr = 1; t_ctr < 31; t_ctr++){    
+      trk_buffer[t_ctr-1] = SYM_SPACE + (t_ctr%2);
+  }
+  screenBuffer[30]=0;
+  MAX7456_WriteString(trk_buffer, (LINE*2));
+      
+  // TEST ONLY - display alternate SPACE then MARK...
+  for (uint8_t t_ctr = 2; t_ctr < 32; t_ctr++){    
+      trk_buffer[t_ctr-2] = SYM_SPACE + (t_ctr%2);
+  }
+  screenBuffer[30]=0;
+  MAX7456_WriteString(trk_buffer, (LINE*3));
+
+  // TEST ONLY - display MARK only...
+  for (uint8_t t_ctr = 0; t_ctr < 30; t_ctr++){    
+      trk_buffer[t_ctr] = SYM_MARK;
+  }
+  screenBuffer[30]=0;
+  MAX7456_WriteString(trk_buffer, (LINE*4));
+
+  // TEST ONLY - display SPACE only...
+  for (uint8_t t_ctr = 0; t_ctr < 30; t_ctr++){    
+      trk_buffer[t_ctr] = SYM_SPACE;
+  }
+  screenBuffer[30]=0;
   MAX7456_WriteString(trk_buffer, (LINE*5));
 
+  // TEST ONLY - display second more visible full telemtry line...
+  for (uint8_t t_ctr = 0; t_ctr < 30; t_ctr++){
+    if (trk_data&(uint32_t)1<<t_ctr){
+      trk_buffer[t_ctr] = SYM_MARK;
+    }
+    else{
+      trk_buffer[t_ctr] = SYM_SPACE;        
+    }
+  }
+  trk_buffer[30]=0;  MAX7456_WriteString(trk_buffer, (LINE*6));
+
+ // TEST ONLY - display broken out packet data only...
   for (uint8_t t_ctr = 0; t_ctr < 8; t_ctr++){
     screenBuffer[t_ctr] = trk_buffer[t_ctr];
   }
   screenBuffer[8]=0;  
-  MAX7456_WriteString(screenBuffer, 2+(LINE*7));
+  MAX7456_WriteString(screenBuffer, 2+(LINE*8));
   itoa(trk_pitch, screenBuffer, 10);
-  MAX7456_WriteString(screenBuffer, 16+(LINE*7));
+  MAX7456_WriteString(screenBuffer, 16+(LINE*8));
 //  
   for (uint8_t t_ctr = 0; t_ctr < 9; t_ctr++){
     screenBuffer[t_ctr] = trk_buffer[t_ctr+8];
   }
   screenBuffer[9]=0;
-  MAX7456_WriteString(screenBuffer, 2+(LINE*8));
+  MAX7456_WriteString(screenBuffer, 2+(LINE*9));
   itoa(trk_yaw, screenBuffer, 10);
-  MAX7456_WriteString(screenBuffer, 16+(LINE*8));
+  MAX7456_WriteString(screenBuffer, 16+(LINE*9));
 //
   for (uint8_t t_ctr = 0; t_ctr < 13; t_ctr++){
     screenBuffer[t_ctr] = trk_buffer[t_ctr+17];
   }
   screenBuffer[13]=0;
-  MAX7456_WriteString(screenBuffer, 2+(LINE*9));
+  MAX7456_WriteString(screenBuffer, 2+(LINE*10));
   itoa(trk_crc&0x7FFF, screenBuffer, 10);
-  MAX7456_WriteString(screenBuffer, 16+(LINE*9));
+  MAX7456_WriteString(screenBuffer, 16+(LINE*10));
 
+ // TEST ONLY - simulate received decoded data to validate data is correct and CRC working...
   decodeTelemetry(trk_data); 
+
 }
 // **************
 // Telemetry test code
