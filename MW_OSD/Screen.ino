@@ -2538,13 +2538,13 @@ void decodeTelemetry(uint32_t t_data){
 
   uint8_t  trk_pitch = t_data & 0xFF;            // elevation angle to target. 0 to +180 degrees. 0 = nadir, 180 = zenith
   uint16_t trk_yaw   = (t_data >> 8)  & 0x01FF;  // yaw angle to target. 0 = true north. 0 to +360
-  uint16_t trk_crc   = (t_data >> 17) & 0x7FFF;  // CRC check bit 
+  uint16_t trk_crc   = (t_data >> 17) & 0x3FFF;  // CRC check bit 
   uint16_t trk_crc_check;
   
   trk_crc_check =crc_accumulate(trk_pitch, trk_crc_check);
   trk_crc_check =crc_accumulate(trk_yaw&0xFF, trk_crc_check);
   trk_crc_check =crc_accumulate(trk_yaw>>8, trk_crc_check);
-  trk_crc_check = trk_crc_check &0x7FFF;
+  trk_crc_check = trk_crc_check &0x3FFF;
 
   // TEST ONLY - generate simulation pitch and yaw test data 
   if (trk_crc_check == trk_crc){
@@ -2636,14 +2636,14 @@ void encodeTelemetry(void)
   // Prepare screen buffer and write telemetry line
   for (uint8_t t_ctr = 0; t_ctr < 30; t_ctr++){
     if (trk_data&(uint32_t)1<<t_ctr){
-      trk_buffer[t_ctr] = SYM_MARK;
+      trk_buffer[t_ctr] = SYM_SPACE;
     }
     else{
       trk_buffer[t_ctr] = SYM_SPACE;        
     }
   }
   trk_buffer[30]=0;
-  MAX7456_WriteString(trk_buffer, TELEMETRY);
+  MAX7456_WriteString(trk_buffer, TELEMETRY+180);
 
 
 
