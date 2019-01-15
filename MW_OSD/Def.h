@@ -39,17 +39,21 @@
 //#define DEVELOPMENT               // For development set only 
 #ifdef DEVELOPMENT                  // Development pre-set test paramters only 
 
+  //#define MAXTRACK                  // enables telemetry
+  //#define MAXTRACK_TESTLINE         // dev: draws a second more visible telemetry line
+  //#define MAXTRACK_TESTDATA         // dev: simulates telemetry test data for debugging
+
   #define DEBUG 4                 // Enable/disable option to display OSD debug values. Define which OSD switch position to show debug on screen display 0 (default), 1 or 2. 4 for always on
-  #undef GPSTIME
+  //#undef GPSTIME
 
   //#define AIRBOTMICRO             // Uncomment this if using an airbot MicroOSD
   //#define EEPROMVER 16              // for eeprom layout verification
-  #define AEROMAX                 // Uncomment this if using MWOSD AEROMAX hardware
+  //#define AEROMAX                 // Uncomment this if using MWOSD AEROMAX hardware
   //#define MINIMOSD                  // Uncomment this if using standard MINIMOSD hardware (default)
   //#define GPSOSD_NMEA             // Uncomment this if you are using a NMEA compatible GPS module for a GPS based OSD
   //#define GPSOSD_UBLOX            // Uncomment this if you are using a UBLOX GPS module for a GPS based OSD
   //#define BETAFLIGHT                // Uncomment this if you are using latest BETAFLIGHT version 3.1 onwards
-  #define APM
+  //#define APM
   //#define PX4                     // Uncomment this if you are using PIXHAWK with PX4 stack
   //#define DISPLAYAVGEFFICIENCY                // Display average mAh used / per KM instead of mAh/min KMh. 
   //#define iNAV                    // Uncomment this if you are using latest iNAV version from repository (1.01 at time of this MWOSD release)
@@ -64,7 +68,7 @@
   //#define MAV_ALT_THROTTLE          // Use alternative MAV throttle value. Not raw RC channel.
   //#define TX_CHANNELS 16 
   //#define PPM_CONTROL               // Enables full OSD menu, screen switching, RSSI, Throttle feature, virtual current sensor, etc using a PPM signal into OSD PWM input pin (RSSI pin on basic MINIM hardware). Requires TX type to be set below.
-  
+
 //#define CLEANFLIGHT               // Uncomment this if you are using latest CLEANFLIGHT version from repository (2.2.0 at time of this MWOSD release)
 //#define iNAV                      // Uncomment this if you are using latest iNAV version from repository (1.01 at time of this MWOSD release)
 //#define iNAV_KK                   // Uncomment this if you are using AEROMAX OSD and BARO sensor addition with iNAV with KK audio vario

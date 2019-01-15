@@ -28,8 +28,8 @@ void GPS_distance_cm_bearing(int32_t* lat1, int32_t* lon1, int32_t* lat2, int32_
 
 void GPS_reset_home_position() {
   if (GPS_fix && GPS_numSat >= MINSATFIX) {
-    GPS_home[LAT] = GPS_latitude;
-    GPS_home[LON] = GPS_longitude;
+    GPS_home[LAT] = GPS_coord[LAT];
+    GPS_home[LON] = GPS_coord[LON];
     if (!MSP_home_set)
       mw_ltm.GPS_altitude_home = GPS_altitude;
   }
@@ -71,8 +71,8 @@ void ltm_check() {
 #ifdef ALARM_GPS
     timer.GPS_active=ALARM_GPS;
 #endif //ALARM_GPS
-    GPS_latitude = (int32_t)ltmread_u32();
-    GPS_longitude = (int32_t)ltmread_u32();
+    GPS_coord[LAT] = (int32_t)ltmread_u32();
+    GPS_coord[LON] = (int32_t)ltmread_u32();
     GPS_speed = ltmread_u8() * 100;            // LTM gives m/s, we expect cm/s
     GPS_altitude = ((int32_t)ltmread_u32());   // LTM altitude in cm.
     if (GPS_fix_HOME == 0){
@@ -88,7 +88,7 @@ void ltm_check() {
     if ((GPS_fix>0) && (GPS_numSat >= MINSATFIX)) {
       uint32_t dist;
       int32_t  dir;
-      GPS_distance_cm_bearing(&GPS_latitude,&GPS_longitude,&GPS_home[LAT],&GPS_home[LON],&dist,&dir);
+      GPS_distance_cm_bearing(&GPS_coord[LAT],&GPS_coord[LON],&GPS_home[LAT],&GPS_home[LON],&dist,&dir);
       GPS_distanceToHome = dist/100;
       GPS_directionToHome = dir/100;
     } 

@@ -59,14 +59,14 @@ uint8_t fieldIsVisible(uint8_t pos) {
 char *FormatGPSCoord(uint16_t t_position, int32_t val, uint8_t t_cardinalaxis) {  // lat = 0 or lon = 2
 
   uint8_t t_leadicon = SYM_LAT;
-  if (t_cardinalaxis>0) 
-    t_leadicon++;  
+  if (t_cardinalaxis > 0)
+    t_leadicon++;
   uint8_t t_cardinal = 0;
   if (val < 0) {
-      t_cardinal ++;
+    t_cardinal ++;
     val = -val;
   }
-  t_cardinal+=t_cardinalaxis;
+  t_cardinal += t_cardinalaxis;
 
   uint8_t bytes = 11;
   val = val / 100;
@@ -93,7 +93,7 @@ char *FormatGPSCoord(uint16_t t_position, int32_t val, uint8_t t_cardinalaxis) {
     screenBuffer[3] = '3';
   }
 
-   MAX7456_WriteString(screenBuffer, t_position);
+  MAX7456_WriteString(screenBuffer, t_position);
 }
 
 #ifdef VIRTUAL_NOSE
@@ -194,7 +194,7 @@ void displayMode(void)
   else if (MwSensorActive & mode.gpshold) {
     flightmode = 6;
   }
-  else if (MwSensorActive & mode.cruise){
+  else if (MwSensorActive & mode.cruise) {
     flightmode = 4;
   }
   else if (MwSensorActive & mode.stable) {
@@ -272,7 +272,7 @@ void displayMode(void)
     apactive = 3;
   else if (MwSensorActive & mode.gpsmission)
     apactive = 4;
-#ifdef EXTENDEDMODESUPPORT  
+#ifdef EXTENDEDMODESUPPORT
   else if (MwSensorActive & mode.launch)
     apactive = 5;
   else if (MwSensorActive & mode.autotrim)
@@ -582,7 +582,7 @@ void displayVidVoltage(void)
 }
 
 
-void displayCurrentThrottle(void){
+void displayCurrentThrottle(void) {
 
 #ifdef AUTOTHROTTLE
   if (MwRcData[THROTTLESTICK] > HighT) HighT = MwRcData[THROTTLESTICK];
@@ -594,16 +594,16 @@ void displayCurrentThrottle(void){
   LowT = LOWTHROTTLE;
 #endif
   uint16_t t_throttle = MwRcData[THROTTLESTICK];
-  uint8_t t_symbol=0;
+  uint8_t t_symbol = 0;
   if (Settings[S_THROTTLE_PWM] == 0) {
     t_throttle = map(MwRcData[THROTTLESTICK], LowT, HighT, 0, 100);
-    t_symbol=SYM_PERCENT;
+    t_symbol = SYM_PERCENT;
   }
-  if (!armed){
+  if (!armed) {
     t_throttle = 0;
     t_symbol   = SYM_ZERO;
   }
-  displayItem(CurrentThrottlePosition, t_throttle, SYM_THR, t_symbol, 0 );  
+  displayItem(CurrentThrottlePosition, t_throttle, SYM_THR, t_symbol, 0 );
 }
 
 void OLDdisplayCurrentThrottle(void)
@@ -657,69 +657,69 @@ void OLDdisplayCurrentThrottle(void)
 
 void displayTimer(uint32_t t_time, uint16_t t_pos, uint8_t t_leadsymbol)
 {
-  if (t_time>=3600){
-    t_time /=60;
+  if (t_time >= 3600) {
+    t_time /= 60;
   }
-  uint32_t digit0 = t_time/60;
-  uint32_t digit1 = t_time%60;
-  if (t_leadsymbol>0){
-    screenBuffer[0]=t_leadsymbol;
-    screenBuffer[1]=0;
-    MAX7456_WriteString(screenBuffer, t_pos);  
+  uint32_t digit0 = t_time / 60;
+  uint32_t digit1 = t_time % 60;
+  if (t_leadsymbol > 0) {
+    screenBuffer[0] = t_leadsymbol;
+    screenBuffer[1] = 0;
+    MAX7456_WriteString(screenBuffer, t_pos);
     t_pos++;
   }
   formatDateTime(digit0, digit1, 0, ':', 0);
-  MAX7456_WriteString(screenBuffer, t_pos);  
+  MAX7456_WriteString(screenBuffer, t_pos);
 }
 
 
-void displayRemainingTime(void){
+void displayRemainingTime(void) {
   int32_t t_remaining;
-  int32_t t_used = 100 * Settings[S_AMPER_HOUR_ALARM]- (amperagesum/(360));  
+  int32_t t_used = 100 * Settings[S_AMPER_HOUR_ALARM] - (amperagesum / (360));
   if (screenPosition[remainingTimePosition] < 512)
     return;
-  if (t_used < 0){
+  if (t_used < 0) {
     t_used = 0;
   }
-#ifdef EFFICIENCYTIMEINST  
-  if (amperage>1){
-    t_remaining = (uint32_t) 60 * 60 *(t_used)/(amperage * 100);
+#ifdef EFFICIENCYTIMEINST
+  if (amperage > 1) {
+    t_remaining = (uint32_t) 60 * 60 * (t_used) / (amperage * 100);
   }
 #else
-  if (amperagesum>100){
-    t_remaining = (uint32_t) flyTime *(t_used)/(amperagesum/360);
+  if (amperagesum > 100) {
+    t_remaining = (uint32_t) flyTime * (t_used) / (amperagesum / 360);
   }
 #endif
-  else{ 
+  else {
     t_remaining = 0;
   }
-  displayTimer(t_remaining,getPosition(remainingTimePosition), 0x2A);
+  displayTimer(t_remaining, getPosition(remainingTimePosition), 0x2A);
 }
 
 
-void displayFlightTime(void){
+void displayFlightTime(void) {
   if (screenPosition[onTimePosition] < 512)
     return;
 
   uint32_t displaytime;
   uint8_t t_leadsymbol = 0;
-  
+
   if (armed) {
     if (Settings[S_FLYTIME_ALARM] > 0) {
       if (((flyTime / 60) >= Settings[S_FLYTIME_ALARM]) && (timer.Blink2hz))
         return;
     }
-      t_leadsymbol +=2;
-      displaytime = flyTime;
+    t_leadsymbol += 2;
+    displaytime = flyTime;
   }
   else {
-      screenBuffer[0] = SYM_ON_H;
-      displaytime = onTime;
+    screenBuffer[0] = SYM_ON_H;
+    displaytime = onTime;
   }
-  if (displaytime>=3600){
-    t_leadsymbol+=1;
+  if (displaytime >= 3600) {
+    t_leadsymbol += 1;
   }
-  displayTimer(displaytime,getPosition(onTimePosition), flightUnitAdd[t_leadsymbol]);
+  displayTimer(displaytime, getPosition(onTimePosition), flightUnitAdd[t_leadsymbol]);
 }
 
 
@@ -760,10 +760,10 @@ void displayEfficiency(void)
 void displayAverageEfficiency(void)
 {
   uint16_t t_efficiency;
-  if (flyTime > 0){
-    t_efficiency = (uint32_t) amperagesum /(6 * flyTime) ;
-  if (t_efficiency < 99999)
-    displayItem(avgefficiencyPosition, t_efficiency, SYM_AVG_EFF, 0, 0 );
+  if (flyTime > 0) {
+    t_efficiency = (uint32_t) amperagesum / (6 * flyTime) ;
+    if (t_efficiency < 99999)
+      displayItem(avgefficiencyPosition, t_efficiency, SYM_AVG_EFF, 0, 0 );
   }
 }
 
@@ -2378,6 +2378,7 @@ void displayDateTime(void)
   MAX7456_WriteString(screenBuffer, LINE + getPosition(GPS_timePosition));
 }
 
+
 void formatDateTime(uint8_t digit1, uint8_t digit2, uint8_t digit3, uint8_t seperator, uint8_t dtsize) {
   ItoaPadded(digit1, screenBuffer, 2, 0);
   screenBuffer[2] = seperator;
@@ -2394,6 +2395,7 @@ void formatDateTime(uint8_t digit1, uint8_t digit2, uint8_t digit3, uint8_t sepe
     if (screenBuffer[i] == 0x20) screenBuffer[i] = 0x30; // replace leading 0
 }
 
+
 void setDateTime(void)
 {
   if (GPS_numSat >= MINSATFIX) {
@@ -2407,13 +2409,13 @@ void updateDateTime(uint32_t t_time)
   //datetime.unixtime=1527712200; // 30/05/2018 @ 20:30 UTC for testing
 
   t_time -= 946684800;
-  uint8_t  t_year=0;
-  uint8_t  t_month=0;
-  uint8_t  t_monthsize=0;
-  uint32_t t_days=0;
+  uint8_t  t_year = 0;
+  uint8_t  t_month = 0;
+  uint8_t  t_monthsize = 0;
+  uint32_t t_days = 0;
   static const uint8_t daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-#define LEAP_YEAR(Y) !(((Y))%4) 
+#define LEAP_YEAR(Y) !(((Y))%4)
 #ifndef DATEFORMAT_UTC
   int32_t t_tzhours = 3600 * (128 - Settings[S_GPSTZ]);
   t_time = t_time - t_tzhours;
@@ -2459,17 +2461,98 @@ void updateDateTime(uint32_t t_time)
   datetime.year  = t_year;
 }
 
+
 void displayGPSPosition(void)
 {
-  if (!fieldIsVisible(MwGPSLatPositionTop)){
+  if (!fieldIsVisible(MwGPSLatPositionTop)) {
     return;
   }
   uint16_t t_position;
   t_position = getPosition(MwGPSLatPositionTop);
-  FormatGPSCoord(t_position,GPS_latitude, 0) ;
+  FormatGPSCoord(t_position, GPS_coord[LAT], 0) ;
   t_position = getPosition(MwGPSLonPositionTop);
-  FormatGPSCoord(t_position,GPS_longitude, 2) ;
+  FormatGPSCoord(t_position, GPS_coord[LON], 2) ;
 }
 
 
+#ifdef MAXTELEMETRY
+uint16_t crc_accumulate(uint8_t data, uint16_t crcAccum)
+{
+  uint8_t tmp;
+  tmp = data ^ (uint8_t)(crcAccum & 0xff);
+  tmp ^= (tmp << 4);
+  crcAccum = (crcAccum >> 8) ^ (tmp << 8) ^ (tmp << 3) ^ (tmp >> 4);
+  return crcAccum;
+}
 
+
+void encodeMAXtelemetry(void)
+{
+#define           SYM_MARK  0xC3   // Character font used for binary 1
+#define           SYM_SPACE 0xC2   // Character font used for binary 0
+  uint32_t          trk_data;
+  uint16_t          trk_crc = 0;
+  char              trk_buffer[31];  // MAX line buffer - review if can use fontdata for memory save
+  static int16_t    trk_elevation = 127;
+  static uint16_t   trk_bearing   = 180;
+
+#ifdef MAXTRACK_TESTDATA // TEST ONLY - generate simulation pitch and yaw test data
+  static uint32_t trk_timer;       // CRC test timer
+  if (millis() > trk_timer) {
+    trk_elevation++;
+    trk_bearing++;
+    trk_timer += 66;               // 15 degrees per second.
+  }
+  if (trk_elevation > 127) {
+    trk_elevation = 0;
+  }
+  if (trk_bearing > 359) {
+    trk_bearing   = 0;
+  }
+#else // use real data
+  if (armed) {
+    if (GPS_numSat >= MINSATFIX) {
+      trk_bearing = GPS_directionToHome;
+      trk_bearing += 360;
+      trk_bearing %= 360;
+      float at = atan2(GPS_altitude, GPS_distanceToHome);
+      trk_elevation = (float)at * 57.2957795;
+      trk_elevation += 37;
+      if (trk_elevation < 0) {
+        trk_elevation = 0;
+      }
+      if (GPS_distanceToHome <= 10) {
+        trk_elevation = 127;
+      }
+    }
+  }
+#endif // MAXTRACK_TESTDATA
+  if (0 == 1) { // Reserved for future sending a data packet
+    trk_data = 1;
+  }
+  else {
+    trk_data = 0;                                                // bit  0    - packet type 0 = bearing/elevation, 1 = 2 byte data packet
+    trk_data = trk_data | (uint32_t)(0x7F & trk_elevation) << 1; // bits 1-7  - elevation angle to target. NOTE uint8 is abused. constrained value of -37 to 90 sent as 0 to 127.
+    trk_data = trk_data | ((uint32_t)trk_bearing << 8);          // bits 8-17 - bearing angle to target. 0 = true north. 0 to 360
+    trk_crc = crc_accumulate(0xFF & trk_data, trk_crc);          // CRC First Byte  bits 0
+    trk_crc = crc_accumulate(0xFF & trk_bearing, trk_crc);       // CRC Second Byte bits 1-8
+    trk_crc = crc_accumulate(trk_bearing >> 8, trk_crc);         // CRC Third Byte  bit  9-16
+    trk_data = trk_data | ((uint32_t)trk_crc << 17);             // bits 18-29 CRC & 0x3FFFF
+  }
+
+  for (uint8_t t_ctr = 0; t_ctr < 30; t_ctr++) { // Prepare screen buffer and write data line. Big Endian
+    if (trk_data & (uint32_t)1 << t_ctr) {
+      trk_buffer[29 - t_ctr] = SYM_MARK;
+    }
+    else {
+      trk_buffer[29 - t_ctr] = SYM_SPACE;
+    }
+  }
+  trk_buffer[30] = 0;
+
+  MAX7456_WriteString(trk_buffer, 0);
+#ifdef MAXTRACK_TESTLINE // TEST ONLY - display second more visible full data line...
+  MAX7456_WriteString(trk_buffer, 360);
+#endif
+}
+#endif //MAXTRACK

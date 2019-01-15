@@ -39,8 +39,8 @@ void GPS_distance_cm_bearing(int32_t* lat1, int32_t* lon1, int32_t* lat2, int32_
 
 
 void GPS_reset_home_position() {
-  GPS_home[LAT] = GPS_latitude;
-  GPS_home[LON] = GPS_longitude;
+  GPS_home[LAT] = GPS_coord[LAT];
+  GPS_home[LON] = GPS_coord[LON];
   //GPS_altitude_home = GPS_altitude;
 }
 
@@ -320,8 +320,8 @@ void serialMAVCheck() {
       GPS_numSat = serialBuffer[29];
       GPS_fix = serialBuffer[28];
       GPS_ground_course = (serialBuffer[26] | (serialBuffer[27] << 8)) / 10;
-      GPS_latitude = serialbufferint(8);
-      GPS_longitude = serialbufferint(12);
+      GPS_coord[LAT] = serialbufferint(8);
+      GPS_coord[LON] = serialbufferint(12);
       GPS_dop = (int16_t)(serialBuffer[20] | serialBuffer[21] << 8);
       if ((GPS_fix_HOME == B00000001) && (GPS_numSat >= MINSATFIX) && armed) {
         GPS_fix_HOME |= B00000011;
@@ -330,7 +330,7 @@ void serialMAVCheck() {
       if ((GPS_numSat >= MINSATFIX) && (GPS_fix_HOME > 1)) {
         uint32_t dist;
         int32_t  dir;
-        GPS_distance_cm_bearing(&GPS_latitude, &GPS_longitude, &GPS_home[LAT], &GPS_home[LON], &dist, &dir);
+        GPS_distance_cm_bearing(&GPS_coord[LAT], &GPS_coord[LON], &GPS_home[LAT], &GPS_home[LON], &dist, &dir);
         GPS_distanceToHome = dist / 100;
         GPS_directionToHome = dir / 100;
       }

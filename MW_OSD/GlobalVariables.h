@@ -407,6 +407,10 @@ uint8_t settingsMode=0;
 uint16_t framerate = 0;
 uint16_t packetrate = 0;
 uint16_t serialrxrate = 0;
+//Telemetry
+int8_t trk_yaw = 0;
+int8_t trk_pitch = 0;
+int8_t trk_ctr = 0;
 
 // Mode bits
 struct __mode {
@@ -805,6 +809,10 @@ volatile uint16_t MwRcData[1+16];
 
 int16_t sensorfilter[SENSORTOTAL][SENSORFILTERSIZE+2]; 
 
+#define  LAT  0
+#define  LON  1
+int32_t  GPS_coord[2];
+int32_t  GPS_home[2];
 uint16_t  MwSensorPresent=0;
 uint32_t  MwSensorActive=0;
 uint8_t MwVBat=0;
@@ -816,8 +824,6 @@ uint16_t armedangle=0;           // for capturing direction at arming
 uint32_t GPS_distanceToHome=0;
 uint8_t GPS_fix=0;
 uint8_t GPS_frame_timer=0;
-int32_t GPS_latitude;
-int32_t GPS_longitude;
 int32_t GPS_altitude;
 int16_t MAV_altitude;                          
 int32_t GPS_altitude_ASL;
@@ -914,12 +920,9 @@ int16_t rssiMIN=100;
 
 // For GPSOSD
 #if defined GPSOSD
-  #define  LAT  0
-  #define  LON  1
   #define  GPS_BAUD BAUDRATE
   uint32_t GPS_home_timer=0;
-  int32_t  GPS_coord[2];
-  int32_t  GPS_home[4];
+
 //  uint16_t GPS_ground_course = 0;                       
   int16_t  GPS_altitude_home;                            
   int16_t  GPS_altitude_home_2;                            
@@ -1959,7 +1962,7 @@ struct __mw_mav {
   uint16_t throttle;
 }mw_mav;
 
-int32_t  GPS_home[2];
+//int32_t  GPS_home[2];
 uint8_t  GPS_fix_HOME;
 int16_t  GPS_altitude_home;  
 #endif //MAVLINK
@@ -1980,7 +1983,7 @@ int16_t  GPS_altitude_home;
 #define  LAT  0
 #define  LON  1
 
-int32_t  GPS_home[2];
+//int32_t  GPS_home[2];
 uint8_t LTMserialBuffer[LIGHTTELEMETRY_GFRAMELENGTH - 4];
 
 

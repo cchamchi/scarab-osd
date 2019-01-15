@@ -487,8 +487,12 @@ if (cmdMSP==MSP_STATUS)
       GPS_fix=1;
     }
     GPS_numSat=read8();
-    GPS_latitude = read32();
-    GPS_longitude = read32();
+    GPS_coord[LAT] = read32();
+    GPS_coord[LON] = read32();
+    //if (GPS_fix && (!armed)) {
+    //  GPS_home[LAT] = GPS_coord[LAT];
+    //  GPS_home[LON] = GPS_coord[LON];
+    //}    
     GPS_altitude = read16();
     #if defined RESETGPSALTITUDEATARM
       if (!armed){

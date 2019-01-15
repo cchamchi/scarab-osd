@@ -30,8 +30,8 @@ void SL_sync() {
 #ifdef DATA_MSP
   timer.MSP_active = DATA_MSP;           // getting something on serial port
 #endif
-  GPS_longitude = SLread_u32(8);
-  GPS_latitude  = SLread_u32(4);
+  GPS_coord[LON] = SLread_u32(8);
+  GPS_coord[LAT]  = SLread_u32(4);
   GPS_numSat    = SLread_u8(21);
   GPS_altitude  = SLread_u16(12);
 //  pitchAngle    = SLread_u16(0);
@@ -140,10 +140,10 @@ void DrawSkytrack(){
 
 //CO-ORDINATES
     screenBuffer[0] = SYM_LAT;
-    FormatGPSCoord(GPS_latitude, screenBuffer + 1, 4, 'N', 'S');
+    FormatGPSCoord(GPS_coord[LAT], screenBuffer + 1, 4, 'N', 'S');
     MAX7456_WriteString(screenBuffer, SL_LAT_POS);
     screenBuffer[0] = SYM_LON;
-    FormatGPSCoord(GPS_longitude, screenBuffer + 1, 4, 'E', 'W');
+    FormatGPSCoord(GPS_coord[LON], screenBuffer + 1, 4, 'E', 'W');
     MAX7456_WriteString(screenBuffer, SL_LON_POS);
 //CO-ORDINATES
   

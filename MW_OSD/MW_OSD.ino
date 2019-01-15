@@ -1,5 +1,4 @@
 
-
 /*
 Scarab NG OSD ...
 
@@ -352,6 +351,7 @@ void loop()
 
   if ((currentMillis - previous_millis_low) >= lo_speed_cycle) // 10 Hz (Executed every 100ms)
   {
+ 
     previous_millis_low = previous_millis_low + lo_speed_cycle;
     timer.tenthSec++;
     timer.halfSec++;
@@ -709,6 +709,9 @@ void loop()
 #ifdef MAV_STATUS
         displayMAVstatustext();
 #endif
+#ifdef MAXTELEMETRY
+        encodeMAXtelemetry();
+#endif      
       }
     }
   }  // End of fast Timed Service Routine (50ms loop)
@@ -729,6 +732,7 @@ void loop()
 
   if (millis() > timer.seconds + 1000)  // this execute 1 time a second
   {
+
 #if defined (GPSTIME) && !defined (UBLOX)
     datetime.unixtime++;
     updateDateTime(datetime.unixtime);

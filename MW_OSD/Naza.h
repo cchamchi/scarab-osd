@@ -51,8 +51,8 @@ void GPS_NewData() {
     GPS_directionToHome = dir/100;
     GPS_altitude =  GPS_altitude- GPS_altitude_home;
     MwAltitude = (int32_t)GPS_altitude *100;
-    GPS_latitude = GPS_coord[LAT];
-    GPS_longitude = GPS_coord[LON];
+    GPS_coord[LAT] = GPS_coord[LAT];
+    GPS_coord[LON] = GPS_coord[LON];
     int16_t MwHeading360=GPS_ground_course/10;
     if (MwHeading360>180)
     MwHeading360 = MwHeading360-360;
