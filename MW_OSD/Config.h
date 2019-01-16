@@ -98,8 +98,8 @@
 /********************       FEATURES      *********************/
 // Disable features if you require memory for other features
 // Further configuration may be require elsewhere in config.h + option enabled on GUI
-//#define HORIZON                     // Enable/disable HORIZON indicator
-//#define MAPMODE                     // Enable/disable MAP MODE - map indication of relative positions of home and aircraft
+#define HORIZON                     // Enable/disable HORIZON indicator
+#define MAPMODE                     // Enable/disable MAP MODE - map indication of relative positions of home and aircraft
 //#define SBDIRECTION               // Enable/disable sidebar indicators (icons indicationg changes in speed or altitude)
 //#define SPORT                     // Enable/disable FRSKY S.PORT cell code
 
@@ -444,9 +444,9 @@
 
 /********************  Under development      *********************/
 // This is a work in process. Not completed for implementation
-#define MAXTELEMETRY                // enables telemetry via 7456 character display
-#define MAXTRACK_TESTLINE         // dev: draws a second more visible telemetry line
-#define MAXTRACK_TESTDATA         // dev: simulates telemetry test data for debugging
+//#define MAXTELEMETRY                // enables telemetry via 7456 character display
+//#define MAXTRACK_TESTLINE         // dev: draws a second more visible telemetry line
+//#define MAXTRACK_TESTDATA         // dev: simulates telemetry test data for debugging
 
 
 
